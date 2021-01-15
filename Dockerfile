@@ -28,19 +28,6 @@ RUN apt-get update && apt-get install -y git nodejs npm \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* 
   
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends openjdk-11-jre-headless graphviz wget \
-  && wget "http://downloads.sourceforge.net/project/plantuml/${PLANTUML_VERSION}/plantuml.${PLANTUML_VERSION}.jar" -O /usr/local/bin/plantuml.jar \
-  && apt-get remove -y wget \
-  && apt-get -y autoremove \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
-  
-ADD plantuml /usr/local/bin/
-
-RUN chmod 0755 /usr/local/bin/plantuml
-
-
 RUN du --summarize -h 2>/dev/null; exit 0
   
 WORKDIR /documents
