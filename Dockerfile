@@ -5,16 +5,16 @@ RUN apt-get update \
  && cd /wavedrom-cli && npm install wavedrom-cli --save-dev
 
 
-FROM ruby:2.7.3-alpine3.13
+FROM ruby:3.1.0-alpine3.15
 MAINTAINER Bitvai Csaba
 
-ENV ASCIIDOCTOR_VERSION=2.0.13 \
-  ASCIIDOCTOR_PDF_VERSION=1.5.4 \
-  ASCIIDOCTOR_DIAGRAM_VERSION=2.1.0 \
+ENV ASCIIDOCTOR_VERSION=2.0.17 \
+  ASCIIDOCTOR_PDF_VERSION=1.6.2 \
+  ASCIIDOCTOR_DIAGRAM_VERSION=2.2.1 \
   ASCIIDOCTOR_REVEALJS_VERSION=4.1.0 \
   ASCIIDOCTOR_ROUGE_VERSION=0.4.0 \
   DIAGRAM_PLANTUML_CLASSPATH=/usr/local/bin/plantuml.jar
-ENV PLANTUML_VERSION=1.2021.4
+ENV PLANTUML_VERSION=1.2022.0
 
 WORKDIR /node_modules
 COPY --from=0 /wavedrom-cli/node_modules .
