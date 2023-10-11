@@ -1,0 +1,124 @@
+= Test page
+Bitvai, Csaba <csaba.bitvai@semilab.hu>
+:data-uri:
+//:toc:
+//:numbered:
+//:localdatetime:
+:doctype: book
+
+
+== Main events during load sequence
+Modification: _GemMaterialReceivedEvent_ is sent only when cassette placed and the cover is closed.
+
+[plantuml, aftermodloadseq, svg]
+----
+@startuml
+skin rose
+scale 0.8
+actor Operator as OP 
+participant Equipment as EQ
+participant Host 
+
+== Loadport empty ==
+
+OP->EQ: Open cover and place cassette
+EQ->Host: S6F11 (PortTransferStateChanged [87600])
+EQ->Host: S6F11 (LoadComplete [87611])
+OP->EQ: Close cover
+EQ->Host: S6F11 (GemMaterialReceivedEvent [30750])
+EQ->Host: S6F11 (CarrierIDReadFail [87505])
+Host->EQ: S2F41 <DOCK>
+EQ->Host: S6F11 (CarrierLocationChange [87506])
+EQ->Host: S6F11 (CarrierClamped [87504])
+note over Host: shutter opening
+EQ->Host: S6F11 (CarrierOpened [87507])
+EQ->Host: S6F11 (CarrierLocationChange [87506])
+EQ->Host: S6F11 (CarrierDocked [87512])
+note over Host: cassette mapping
+EQ->Host: S6F11 (CarrierSMTrans14 [87515])
+note left: provide slotmap
+loop for every subst location and substrate
+EQ->Host: S6F11 (SubstLocStateChanged [90544])
+EQ->Host: S6F11 (SubstProcStateChanged [90542])
+EQ->Host: S6F11 (SubstStateChanged [90543])
+end
+Host->EQ: S2F41 <PP-SELECT>
+Host->EQ: S2F41 <START>
+== Job processing ==
+
+@enduml
+----
+NOTE: The S2F42, S6F12 left out for brevity
+
+[wavedrom, loadseq, svg]
+----
+{ signal: [
+  ['Station',
+   ['Transfer signal msg',
+    {name: 'OnlineStatus',     wave: '01.|...........'},
+    {name: 'SubstrateOnStage', wave: '0..|.....1.....', node:'..'},
+    {name: 'LoadRequest',      wave: '0.1|........0..', node:'............h'},
+    {name: 'TransferEnable',   wave: '0..|...1....0..', node:'.......d....i'},
+   ],
+    {name: 'SendProcessDataResponse', wave: 'z..|.xz........', node:'.....x'},
+  ],
+  {},
+  ['Control',
+   ['Transfer signal msg',
+    {name: 'OnlineStatus',          wave:'01.|...........'},
+    {name: 'TransferReady',         wave:'0..|..1......0.', node:'......c......j'},
+    {name: 'RobotAccessing',        wave:'0..|....1.0....', node:'........e.f' },
+    {name: 'RobotEnd',              wave:'0..|.......1.0.', node:'...........g.k'},
+    {name: 'SubstrateLoadComplete', wave:'0..|.....1...0.', node:'...........'},
+   ],
+    {name: 'SendProcessDataRequest', wave:'z..|xz.........', node:'....y'}
+  ],
+],
+ edge:[
+    'x~y','c~>d','d~>e','f~>g','g~>h','g~>i','i~>j','i~>k'
+  ],
+head:{
+   text:'',
+   tick:0,
+},
+}
+----
+[[main-classes]]
+.The PlantUML block extension class
+[plantuml, sample-plantuml-diagram, alt="Class diagram", width=135, height=118]
+----
+class BlockProcessor
+class PlantUmlBlock
+BlockProcessor <|-- PlantUmlBlock
+----
+
+
+[ditaa]
+----
+                   +-------------+
+                   | Asciidoctor |-------+
+                   |  Diagram    |       |
+                   +-------------+       | PNG out
+                       ^                 |
+                       | ditaa in        |
+                       |                 v
+ +--------+   +--------+----+    /----------------\
+ |        | --+ Asciidoctor +--> |                |
+ |  Text  |   +-------------+    |Beautiful output|
+ |Document|   |   !magic!   |    |                |
+ |     {d}|   |             |    |                |
+ +---+----+   +-------------+    \----------------/
+     :                                   ^
+     |          Lots of work             |
+     +-----------------------------------+
+----
+[graphviz, dot-example, svg]
+----
+digraph g {
+    a -> b
+    b -> c
+    c -> d
+    d -> a
+}
+----
+
