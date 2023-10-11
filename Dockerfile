@@ -1,21 +1,21 @@
-FROM node:stretch-slim
+FROM node:20.8-bookworm-slim
 RUN apt-get update \
  && apt-get install -y git \
  && git clone https://github.com/wavedrom/cli.git /wavedrom-cli \
  && cd /wavedrom-cli && npm install wavedrom-cli --save-dev
 
 
-FROM ruby:3.2.1-alpine3.17
+FROM ruby:3.2.2-alpine3.18
 MAINTAINER Bitvai Csaba
 
-ENV ASCIIDOCTOR_VERSION=2.0.18 \
-  ASCIIDOCTOR_PDF_VERSION=2.3.4 \
-  ASCIIDOCTOR_DIAGRAM_VERSION=2.2.6 \
-  ASCIIDOCTOR_REVEALJS_VERSION=4.1.0 \
+ENV ASCIIDOCTOR_VERSION=2.0.20 \
+  ASCIIDOCTOR_PDF_VERSION=2.3.9 \
+  ASCIIDOCTOR_DIAGRAM_VERSION=2.2.14 \
+  ASCIIDOCTOR_REVEALJS_VERSION=5.0.1 \
   ASCIIDOCTOR_ROUGE_VERSION=0.4.0 \
   ASCIIDOCTOR_MATHEMATICAL_VERSION=0.3.5 \
   DIAGRAM_PLANTUML_CLASSPATH=/usr/local/bin/plantuml.jar
-ENV PLANTUML_VERSION=1.2023.5
+ENV PLANTUML_VERSION=1.2023.11
 
 WORKDIR /node_modules
 COPY --from=0 /wavedrom-cli/node_modules .
@@ -53,7 +53,7 @@ RUN apk update \
     tilt \
     text-hyphen \
  && apk del -r --no-cache .rubymake \
- && wget "http://downloads.sourceforge.net/project/plantuml/${PLANTUML_VERSION}/plantuml-nodot.${PLANTUML_VERSION}.jar" -O /usr/local/bin/plantuml.jar \
+ && wget "https://github.com/plantuml/plantuml/releases/download/v${PLANTUML_VERSION}/plantuml-${PLANTUML_VERSION}.jar" -O /usr/local/bin/plantuml.jar \
  && ln -s /node_modules/wavedrom-cli/wavedrom-cli.js /usr/local/bin/wavedrom-cli
 
 WORKDIR /documents
