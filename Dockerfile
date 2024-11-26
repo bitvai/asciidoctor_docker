@@ -35,6 +35,7 @@ RUN apk update \
 	which \
 	nodejs \
 	openjdk17-jre \
+	pandoc \
  && apk add --no-cache --virtual .rubymake \
 	build-base \
 	wget \
